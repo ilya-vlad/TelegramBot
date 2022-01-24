@@ -18,8 +18,8 @@ namespace Bot
         private readonly IConfiguration _config;
         private readonly ILogger<TelegramBot> _logger;
         private CancellationTokenSource _cts;
-        private ResponseProvider _responseProvider;
-
+        private readonly ResponseProvider _responseProvider;
+       
         public TelegramBot(ILogger<TelegramBot> logger, IConfiguration config, ResponseProvider responseProvider)
         {
             _logger = logger;
@@ -66,12 +66,14 @@ namespace Bot
            
             _logger.LogInformation($"Received a '{messageText}' message in chat {chatId}.");
 
-            string response = _responseProvider.GetResponseMessage(chatId, messageText);            
+            string response = _responseProvider.GetResponseMessage(messageText);            
 
             Message sentMessage = await botClient.SendTextMessageAsync(
                 chatId: chatId,
                 text: response,
                 cancellationToken: cancellationToken);
+
+            _logger.LogInformation($"Sent reply to chat {chatId}.");
         }
 
         private Task HandleErrorAsync(ITelegramBotClient botClient, Exception exception, CancellationToken cancellationToken)

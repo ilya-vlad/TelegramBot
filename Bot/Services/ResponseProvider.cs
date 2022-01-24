@@ -1,76 +1,94 @@
-﻿using Bot.Common;
-using Bot.Services.Cache;
-using Bot.Services.Strategies;
+﻿using Bot.Services.Strategies;
+using CacheContext;
+using JsonDeserializer;
 using Microsoft.Extensions.Logging;
 using System;
-using System.Linq;
-
+using System.Text.RegularExpressions;
 
 namespace Bot.Services
 {
     public class ResponseProvider
     {
         private readonly ILogger<ResponseProvider> _logger;
-        private readonly CacheService _cache;
+        private readonly CacheManager _cache;
         private readonly JsonParser _parser;
         private IResponseStrategy _strategy;
 
-        public ResponseProvider(ILogger<ResponseProvider> logger, CacheService cache, JsonParser parser)
+        private string _currency;
+        private DateTime _date;
+
+        public ResponseProvider(ILogger<ResponseProvider> logger, CacheManager cache, JsonParser parser)
         {
             _logger = logger;
             _cache = cache;
             _parser = parser;
         }
 
-        public string GetResponseMessage(long chatId, string userText)
-        {
-            DefineStrategy(chatId, userText);
+        public string GetResponseMessage(string userText)
+        {            
+            _strategy = GetStrategy(userText);
 
-            return _strategy.GetResponse(chatId, userText);
+            _logger.LogInformation($"Set {_strategy.GetType().Name}");
+
+            string response = _strategy.GetResponse(_currency, _date);
+
+            return $"{response}\n\n" +
+                $"{Resources.Messages.TryAgain}\n" +
+                $"{Resources.Messages.ExampleRequest}";
         }
 
-        private void DefineStrategy(long chatId, string userText)
+
+        protected IResponseStrategy GetStrategy(string userText)
         {
-            UserInputData userInputData = _cache.UserInputData.GetByChatId(chatId);
+            if (userText.Equals(Resources.Commands.StartCommand))
+            {
+                return new GreetingStrategy(_cache, _parser);
+            }
+            else if (userText.Equals(Resources.Commands.HelpCommand))
+            {
+                return new CallHelpStrategy(_cache, _parser);
+            }    
+            //other strategies
 
-            if(userText == "/start")
+            try
             {
-                _strategy = new GreetingStrategy(_cache, _parser);                
+                return IsValidInput(userText) == true 
+                    ? new CorrectRequestStrategy(_cache, _parser) 
+                    : new IncorrectRequestStrategy(_cache, _parser);               
             }
-            else if(userInputData == null)
+            catch(Exception ex)
             {
-                if (DateTime.TryParse(userText, out _))
-                {
-                    _strategy = new CorrectDateStrategy(_cache, _parser);
-                    _logger.LogInformation($"User entered a valid date.");
-                }
-                else
-                {
-                    _strategy = new UncorrectDateStrategy(_cache, _parser);
-                    _logger.LogInformation($"User entered invalid date.");
-                }             
+                _logger.LogCritical($"{ex.Message}");
             }
-            else
-            {
-                ExchangeRatesOfOneDay exchangeRates = _cache.ExchangeRates.GetByDate(userInputData.Date);
-                CurrencyItem requestCurrency = exchangeRates.GetCurrency(userText);
 
-                if (!exchangeRates.Currencies.Any())
+            return new IncorrectRequestStrategy(_cache, _parser);
+        }
+
+        private bool IsValidInput(string userText)
+        {
+            string patternWithDate = @"^[a-z]{3} \d{1,2}.\d{1,2}.\d{4}$";
+            string patternWithoutDate = @"^[a-z]{3}$";
+
+            if (Regex.IsMatch(userText, patternWithDate, RegexOptions.IgnoreCase))
+            {
+                var tokens = userText.Split(' ');
+
+                _currency = tokens[0];
+
+                if (DateTime.TryParse(tokens[1], out _date))
                 {
-                    _strategy = new NoDataForThisDateStrategy(_cache, _parser);
-                    _logger.LogInformation($"No exchange rates found for the specified date.");
-                }
-                else if (requestCurrency == null)
-                {
-                    _strategy = new UncorrectCurrencyStrategy(_cache, _parser);
-                    _logger.LogInformation($"User entered invalid name of currency.");
-                }
-                else
-                {                    
-                    _strategy = new CorrectCurrencyStrategy(_cache, _parser);
-                    _logger.LogInformation($"User entered a valid name of currency.");
+                    return true;
                 }
             }
+            else if (Regex.IsMatch(userText, patternWithoutDate, RegexOptions.IgnoreCase))
+            {
+                _currency = userText;
+                _date = DateTime.UtcNow;
+
+                return true;
+            }
+
+            return false;
         }
     }
 }

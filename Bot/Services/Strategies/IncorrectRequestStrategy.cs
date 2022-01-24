@@ -4,16 +4,16 @@ using System;
 
 namespace Bot.Services.Strategies
 {
-    public class GreetingStrategy : BaseResponseStrategy<GreetingStrategy>
+    public class IncorrectRequestStrategy : BaseResponseStrategy<IncorrectRequestStrategy>
     {
-        public GreetingStrategy(CacheManager cache, JsonParser parser) 
+        public IncorrectRequestStrategy(CacheManager cache, JsonParser parser)
             : base(cache, parser)
         {
         }
 
         public override string GetResponse(string currency, DateTime date)
-        {            
-            return Resources.Messages.Greeting;
+        {
+            return Resources.Messages.IncorrectRequest;
         }
     }
 }

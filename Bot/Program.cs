@@ -5,8 +5,8 @@ using System.IO;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Bot.Services;
-using Bot.Services.Cache.Repositories;
-using Bot.Services.Cache;
+using JsonDeserializer;
+using CacheContext;
 
 namespace Bot
 {
@@ -25,14 +25,14 @@ namespace Bot
 
             Log.Logger.Information("Application Starting...");
 
+            
+
             var host = Host.CreateDefaultBuilder()
                 .ConfigureServices((context, services) =>
                 {
-                    services.AddMemoryCache();
-                    services.AddScoped<ExchangeRatesRepository>();
-                    services.AddScoped<UserInputDataRepository>();
-                    services.AddScoped<CacheService>();
-                    services.AddScoped<ResponseProvider>();                    
+                    services.AddMemoryCache();                    
+                    services.AddScoped<CacheManager>();
+                    services.AddScoped<ResponseProvider>();   
                     services.AddScoped<JsonParser>();
                     services.AddSingleton<TelegramBot>();
                 })
