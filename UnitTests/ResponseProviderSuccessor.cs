@@ -1,5 +1,6 @@
 ﻿using API.ApiPrivatBank;
 using API.Common;
+using API.Services.Factory;
 using Bot.Services;
 using Bot.Services.Strategies;
 using CacheContext;
@@ -9,8 +10,8 @@ namespace UnitTests
 {
     public class ResponseProviderSuccessor : ResponseProvider
     {
-        public ResponseProviderSuccessor(ILogger<ResponseProvider> logger, CacheManager cache, JsonParserPrivatBank parser) 
-            : base(logger, cache, parser)
+        public ResponseProviderSuccessor(ILogger<ResponseProvider> logger, CacheManager cache, IJsonParserFactory parserFactory) 
+            : base(logger, cache, parserFactory)
         {           
         }
         

@@ -1,6 +1,7 @@
 ﻿using API.ApiPrivatBank;
 using API.Common;
 using API.Common.Interfaces;
+using API.Services.Factory;
 using Bot.Services.Strategies;
 using CacheContext;
 using Microsoft.Extensions.Logging;
@@ -19,11 +20,11 @@ namespace Bot.Services
         private string _currency;
         private DateTime _date;
 
-        public ResponseProvider(ILogger<ResponseProvider> logger, CacheManager cache, IJsonParser parser)
+        public ResponseProvider(ILogger<ResponseProvider> logger, CacheManager cache, IJsonParserFactory parserFactory)
         {
             _logger = logger;
             _cache = cache;
-            _parser = parser;
+            _parser = parserFactory.GetJsonParser();
         }
 
         public string GetResponseMessage(string userText)

@@ -10,6 +10,7 @@ using API.Common;
 using API.ApiPrivatBank;
 using API.Common.Interfaces;
 using API.ApiRapid;
+using API.Services.Factory;
 
 namespace Bot
 {
@@ -33,17 +34,30 @@ namespace Bot
             var host = Host.CreateDefaultBuilder()
                 .ConfigureServices((context, services) =>
                 {
-                    services.AddMemoryCache();                    
+                    services.AddMemoryCache();
                     services.AddScoped<CacheManager>();
                     services.AddScoped<ResponseProvider>();
-                    services.AddScoped<IJsonParser, JsonParserRapid>();
-                    //services.AddScoped<IJsonParser, JsonParserPrivatBank>();
                     services.AddSingleton<TelegramBot>();
+
+
+                    
+
+                    
+                    
+                    services.AddSingleton<IJsonParserFactory, JsonParserFactory>();
+                    
+
+                    services.AddSingleton<JsonParserPrivatBank>()
+                            .AddSingleton<IJsonParser, JsonParserPrivatBank>( s => s.GetService<JsonParserPrivatBank>());
+
+                    services.AddSingleton<JsonParserRapid>();
+                            services.AddSingleton<IJsonParser, JsonParserRapid>(s => s.GetService<JsonParserRapid>());
+                                 
                 })
                 .UseSerilog()
                 .Build();
 
-            var tBot = ActivatorUtilities.CreateInstance<TelegramBot>(host.Services);
+           var tBot = ActivatorUtilities.CreateInstance<TelegramBot>(host.Services);
 
             try
             {
