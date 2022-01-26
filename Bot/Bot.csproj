@@ -16,9 +16,8 @@
   </ItemGroup>
 
   <ItemGroup>
+    <ProjectReference Include="..\API\API.csproj" />
     <ProjectReference Include="..\CacheService\CacheContext.csproj" />
-    <ProjectReference Include="..\Common\Common.csproj" />
-    <ProjectReference Include="..\JsonReader\JsonDeserializer.csproj" />
   </ItemGroup>
 
   <ItemGroup>

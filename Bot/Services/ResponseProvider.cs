@@ -1,6 +1,8 @@
-﻿using Bot.Services.Strategies;
+﻿using API.ApiPrivatBank;
+using API.Common;
+using API.Common.Interfaces;
+using Bot.Services.Strategies;
 using CacheContext;
-using JsonDeserializer;
 using Microsoft.Extensions.Logging;
 using System;
 using System.Text.RegularExpressions;
@@ -11,13 +13,13 @@ namespace Bot.Services
     {
         private readonly ILogger<ResponseProvider> _logger;
         private readonly CacheManager _cache;
-        private readonly JsonParser _parser;
+        private readonly IJsonParser _parser;
         private IResponseStrategy _strategy;
 
         private string _currency;
         private DateTime _date;
 
-        public ResponseProvider(ILogger<ResponseProvider> logger, CacheManager cache, JsonParser parser)
+        public ResponseProvider(ILogger<ResponseProvider> logger, CacheManager cache, IJsonParser parser)
         {
             _logger = logger;
             _cache = cache;

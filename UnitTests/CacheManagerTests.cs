@@ -5,12 +5,12 @@ using CacheContext;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
-using Common.Models;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Globalization;
 using System.Threading;
+using Api.ApiPrivatBank.Models;
 
 namespace UnitTests
 {
@@ -52,7 +52,7 @@ namespace UnitTests
         [Test]
         public void TestOfAddToCache()
         {
-            DayExchangeRates _testItem = new() { Date = GetRandomDate() };
+            DailyExchangeRates _testItem = new() { Date = GetRandomDate() };
 
             _cacheManager.Add(_testItem);
 
@@ -64,7 +64,7 @@ namespace UnitTests
         [Test]
         public void TestOfGetFromCache()
         {
-            DayExchangeRates _testItem = new() { Date = GetRandomDate() };
+            DailyExchangeRates _testItem = new() { Date = GetRandomDate() };
 
             _memoryCache.Set(_testItem.Date, _testItem);
 
@@ -76,7 +76,7 @@ namespace UnitTests
         [Test]
         public void TestOfContains()
         {
-            DayExchangeRates _testItem = new() { Date = GetRandomDate() };
+            DailyExchangeRates _testItem = new() { Date = GetRandomDate() };
 
             _memoryCache.Set(_testItem.Date, _testItem);
 
@@ -88,7 +88,7 @@ namespace UnitTests
         [Test]
         public void TestOfStorageTimeInCache()
         {
-            DayExchangeRates _testItem = new() { Date = GetRandomDate() };
+            DailyExchangeRates _testItem = new() { Date = GetRandomDate() };
 
             _cacheManager.Add(_testItem);
 

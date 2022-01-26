@@ -1,14 +1,15 @@
-﻿using Bot.Services;
+﻿using API.ApiPrivatBank;
+using API.Common;
+using Bot.Services;
 using Bot.Services.Strategies;
 using CacheContext;
-using JsonDeserializer;
 using Microsoft.Extensions.Logging;
 
 namespace UnitTests
 {
     public class ResponseProviderSuccessor : ResponseProvider
     {
-        public ResponseProviderSuccessor(ILogger<ResponseProvider> logger, CacheManager cache, JsonParser parser) 
+        public ResponseProviderSuccessor(ILogger<ResponseProvider> logger, CacheManager cache, JsonParserPrivatBank parser) 
             : base(logger, cache, parser)
         {           
         }

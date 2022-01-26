@@ -1,12 +1,13 @@
 ﻿using NUnit.Framework;
 using Moq;
-using JsonDeserializer;
 using Microsoft.Extensions.Logging;
 using Bot.Services;
 using Bot.Services.Strategies;
 using CacheContext;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
+using API.Common;
+using API.ApiPrivatBank;
 
 namespace UnitTests
 {
@@ -27,13 +28,13 @@ namespace UnitTests
                     {
                         services.AddMemoryCache();
                         services.AddScoped<CacheManager>();
-                        services.AddScoped<JsonParser>();
+                        services.AddScoped<JsonParserPrivatBank>();
                     })
                     .Build();
 
                 var cacheManager = ActivatorUtilities.CreateInstance<CacheManager>(host.Services);
                 
-                var parser = ActivatorUtilities.CreateInstance<JsonParser>(host.Services);
+                var parser = ActivatorUtilities.CreateInstance<JsonParserPrivatBank>(host.Services);
 
                 _responseProvider = new ResponseProviderSuccessor(logger, cacheManager, parser);
             }

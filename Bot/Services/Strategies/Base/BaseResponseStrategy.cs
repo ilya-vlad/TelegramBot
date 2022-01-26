@@ -1,5 +1,7 @@
-﻿using CacheContext;
-using JsonDeserializer;
+﻿using API.ApiPrivatBank;
+using API.Common;
+using API.Common.Interfaces;
+using CacheContext;
 using System;
 
 namespace Bot.Services.Strategies
@@ -7,9 +9,9 @@ namespace Bot.Services.Strategies
     public abstract class BaseResponseStrategy<T> : IResponseStrategy where T : class
     {       
         protected readonly CacheManager _cache;
-        protected readonly JsonParser _parser;
+        protected readonly IJsonParser _parser;
 
-        public BaseResponseStrategy(CacheManager cache, JsonParser parser)
+        public BaseResponseStrategy(CacheManager cache, IJsonParser parser)
         {            
             _cache = cache;
             _parser = parser;            

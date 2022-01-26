@@ -1,6 +1,8 @@
-﻿using CacheContext;
-using Common.Models;
-using JsonDeserializer;
+﻿using Api.ApiPrivatBank.Models;
+using API.ApiPrivatBank;
+using API.Common;
+using API.Common.Interfaces;
+using CacheContext;
 using System;
 using System.Linq;
 
@@ -8,25 +10,27 @@ namespace Bot.Services.Strategies
 {
     public class CorrectRequestStrategy : BaseResponseStrategy<CorrectRequestStrategy>
     {
-        public CorrectRequestStrategy(CacheManager cache, JsonParser parser)
+        public CorrectRequestStrategy(CacheManager cache, IJsonParser parser)
             : base(cache, parser)
         {
         }
 
         public override string GetResponse(string currency, DateTime date)
         {
-            DayExchangeRates exchangeRates;
+            DailyExchangeRates exchangeRates;
 
             if (!_cache.Contains(date))
             {
-                exchangeRates = _parser.GetExchangeRates(date);                
+                exchangeRates = _parser.GetExchangeRates(date);
                 _cache.Add(exchangeRates);
             }
+            else
+            {
+                exchangeRates = _cache.GetByDate(date);
+            }
 
-            exchangeRates = _cache.GetByDate(date);
-            
-            ExchangeRate rate = exchangeRates.ExchangeRate
-                .Where(r => !string.IsNullOrEmpty(r.Currency) && r.Currency.ToLower() == currency.ToLower())
+            ExchangeRate rate = exchangeRates.ExchangeRates
+                .Where(r => !string.IsNullOrEmpty(r.CurrencyName) && r.CurrencyName.ToLower() == currency.ToLower())
                 .FirstOrDefault();
 
             string response = string.Empty;
@@ -34,7 +38,7 @@ namespace Bot.Services.Strategies
             if(rate != null)
             {
                 response = $"{Resources.Messages.ExchangeRateOn} {date.Date.ToShortDateString()}\n" +
-                $"1 {rate.Currency} = {rate.SaleRateNB} {Resources.Messages.CurrencyUAH}";                
+                $"1 {rate.CurrencyName} = {Math.Round(rate.Rate, 4)} {Resources.Messages.CurrencyUAH}";                
             }
             else
             {

@@ -1,18 +1,21 @@
 using NUnit.Framework;
 using Moq;
 using System;
-using JsonDeserializer;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
-using Common.Models;
 using System.Linq;
+using System.Diagnostics;
+using API.Common;
+using API.Common.Interfaces;
+using API.ApiPrivatBank;
+using Api.ApiPrivatBank.Models;
 
 namespace UnitTests
 {    
     public class JsonParserTests
     {
-        private JsonParser _parser;
+        private JsonParserPrivatBank _parser;
         private IConfiguration _config;
 
         [SetUp]
@@ -20,8 +23,8 @@ namespace UnitTests
         {            
             if( _parser is null)
             {
-                var mockLogger = new Mock<ILogger<JsonParser>>();
-                ILogger<JsonParser> logger = mockLogger.Object;
+                var mockLogger = new Mock<ILogger<JsonParserPrivatBank>>();
+                ILogger<JsonParserPrivatBank> logger = mockLogger.Object;
 
                 var copyAppSettings = new Dictionary<string, string>
                 {
@@ -33,7 +36,7 @@ namespace UnitTests
                     .AddInMemoryCollection(copyAppSettings)
                     .Build();
 
-                _parser = new JsonParser(logger, _config);
+                _parser = new JsonParserPrivatBank(logger, _config);
             }
         }
 
@@ -42,14 +45,14 @@ namespace UnitTests
         {
             var testDate = new DateTime(2022, 1, 1);
 
-            DayExchangeRates result = _parser.GetExchangeRates(testDate);
+            DailyExchangeRates result = _parser.GetExchangeRates(testDate);
 
             Assert.IsNotNull(result);
             Assert.AreEqual(testDate.Date, result.Date);
-            Assert.AreEqual("UAH", result.BaseCurrencyLit);
-            Assert.AreEqual(26, result.ExchangeRate.Count);
-            Assert.AreEqual(0.3639700, GetExchangeRateByName(result, "RUB").SaleRateNB);
-            Assert.AreEqual(27.2782000, GetExchangeRateByName(result, "USD").SaleRateNB);
+            Assert.AreEqual("UAH", result.BaseCurrencyName);
+            Assert.AreEqual(26, result.ExchangeRates.Count);
+            Assert.AreEqual(0.3639700, GetExchangeRateByName(result, "RUB").Rate);
+            Assert.AreEqual(27.2782000, GetExchangeRateByName(result, "USD").Rate);
         }
 
 
@@ -64,12 +67,12 @@ namespace UnitTests
 
             foreach (var d in dates)
             {
-                DayExchangeRates result = _parser.GetExchangeRates(d);
+                DailyExchangeRates result = _parser.GetExchangeRates(d);
 
                 Assert.IsNotNull(result);
                 Assert.AreEqual(d.Date, result.Date);
-                Assert.AreEqual("UAH", result.BaseCurrencyLit);
-                Assert.AreEqual(0, result.ExchangeRate.Count);
+                Assert.AreEqual("UAH", result.BaseCurrencyName);
+                Assert.AreEqual(0, result.ExchangeRates.Count);
             }
         }
 
@@ -86,22 +89,22 @@ namespace UnitTests
             };
 
             foreach(var url in urls)
-            {
-                _config["Api:PrivateBankUrl"] = "wrongURL";
+            {   
+                _config["Api:PrivateBankUrl"] = url;
 
                 var testDate = new DateTime(2022, 1, 1);
 
-                DayExchangeRates result = _parser.GetExchangeRates(testDate);
+                DailyExchangeRates result = _parser.GetExchangeRates(testDate);
 
                 Assert.IsNull(result);
             }
 
-            _config["Api:PrivateBankUrl"] = temp;
+            _config["Api:PrivateBankUrl"] = temp;            
         }
 
-        private ExchangeRate GetExchangeRateByName(DayExchangeRates dayExchangeRates, string name)
+        private ExchangeRate GetExchangeRateByName(DailyExchangeRates dayExchangeRates, string name)
         {
-            return dayExchangeRates.ExchangeRate.Where(c => c.Currency == name.ToUpper()).FirstOrDefault();
+            return dayExchangeRates.ExchangeRates.Where(c => c.CurrencyName == name.ToUpper()).FirstOrDefault();
         }
 
 

@@ -5,8 +5,11 @@ using System.IO;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Bot.Services;
-using JsonDeserializer;
 using CacheContext;
+using API.Common;
+using API.ApiPrivatBank;
+using API.Common.Interfaces;
+using API.ApiRapid;
 
 namespace Bot
 {
@@ -32,8 +35,9 @@ namespace Bot
                 {
                     services.AddMemoryCache();                    
                     services.AddScoped<CacheManager>();
-                    services.AddScoped<ResponseProvider>();   
-                    services.AddScoped<JsonParser>();
+                    services.AddScoped<ResponseProvider>();
+                    services.AddScoped<IJsonParser, JsonParserRapid>();
+                    //services.AddScoped<IJsonParser, JsonParserPrivatBank>();
                     services.AddSingleton<TelegramBot>();
                 })
                 .UseSerilog()

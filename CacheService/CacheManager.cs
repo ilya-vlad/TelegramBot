@@ -1,4 +1,5 @@
-﻿using Common.Models;
+﻿using Api.ApiPrivatBank.Models;
+using API.Common.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
@@ -32,7 +33,7 @@ namespace CacheContext
             options = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(minutes.Value));
         }
 
-        public void Add(DayExchangeRates exchangeRates)
+        public void Add(DailyExchangeRates exchangeRates)
         {
             if(exchangeRates == null)
             {
@@ -41,16 +42,16 @@ namespace CacheContext
 
             if(!_cache.TryGetValue(exchangeRates.Date, out _))
             {
-                _cache.Set(exchangeRates.Date, exchangeRates, options);
+                _cache.Set(exchangeRates.Date.Date, exchangeRates, options);
                 _logger.LogInformation($"Added currencies on {exchangeRates.Date.ToShortDateString()} to cache.");
             }
         }
 
-        public DayExchangeRates GetByDate(DateTime date)
+        public DailyExchangeRates GetByDate(DateTime date)
         {
-            DayExchangeRates exchangeRates;
+            DailyExchangeRates exchangeRates;
 
-            if (_cache.TryGetValue(date.Date, out exchangeRates))
+            if (_cache.TryGetValue(date.Date.Date, out exchangeRates))
             {
                 return exchangeRates;
             }

@@ -1,12 +1,14 @@
-﻿using CacheContext;
-using JsonDeserializer;
+﻿using API.ApiPrivatBank;
+using API.Common;
+using API.Common.Interfaces;
+using CacheContext;
 using System;
 
 namespace Bot.Services.Strategies
 {
     public class GreetingStrategy : BaseResponseStrategy<GreetingStrategy>
     {
-        public GreetingStrategy(CacheManager cache, JsonParser parser) 
+        public GreetingStrategy(CacheManager cache, IJsonParser parser) 
             : base(cache, parser)
         {
         }
