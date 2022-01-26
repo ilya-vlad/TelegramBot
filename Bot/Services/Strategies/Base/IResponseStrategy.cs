@@ -1,6 +1,4 @@
-﻿
-
-using System;
+﻿using System;
 
 namespace Bot.Services.Strategies
 {

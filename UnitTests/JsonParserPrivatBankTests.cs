@@ -5,43 +5,36 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Linq;
-using System.Diagnostics;
-using API.Common;
-using API.Common.Interfaces;
 using API.ApiPrivatBank;
 using Api.ApiPrivatBank.Models;
 
 namespace UnitTests
 {    
-    public class JsonParserTests
+    public class JsonParserPrivatBankTests
     {
         private JsonParserPrivatBank _parser;
         private IConfiguration _config;
 
         [SetUp]
         public void Setup()
-        {            
-            if( _parser is null)
+        {           
+            var mockLogger = new Mock<ILogger<JsonParserPrivatBank>>();
+            ILogger<JsonParserPrivatBank> logger = mockLogger.Object;
+
+            var copyAppSettings = new Dictionary<string, string>
             {
-                var mockLogger = new Mock<ILogger<JsonParserPrivatBank>>();
-                ILogger<JsonParserPrivatBank> logger = mockLogger.Object;
+                {"Api:PrivatBank:Url", "https://api.privatbank.ua/p24api/exchange_rates?json"}                   
+            };
 
-                var copyAppSettings = new Dictionary<string, string>
-                {
-                    {"Api:PrivateBankUrl", "https://api.privatbank.ua/"},
-                    {"Api:UrlParameter", "p24api/exchange_rates?json"},
-                };
+            _config = new ConfigurationBuilder()
+                .AddInMemoryCollection(copyAppSettings)
+                .Build();
 
-                _config = new ConfigurationBuilder()
-                    .AddInMemoryCollection(copyAppSettings)
-                    .Build();
-
-                _parser = new JsonParserPrivatBank(logger, _config);
-            }
+            _parser = new JsonParserPrivatBank(logger, _config);            
         }
 
         [Test]
-        public void ValidDateAndURL()
+        public void Valid_Date_And_URL()
         {
             var testDate = new DateTime(2022, 1, 1);
 
@@ -57,7 +50,7 @@ namespace UnitTests
 
 
         [Test]
-        public void NotValidDate()
+        public void Not_Valid_Date()
         {
             DateTime[] dates =
             {
@@ -77,20 +70,19 @@ namespace UnitTests
         }
 
         [Test]
-        public void NotValidURL()
+        public void Not_Valid_URL()
         {
-            string temp = _config["Api:PrivateBankUrl"];
+            string temp = _config["Api:PrivatBank:Url"];
 
             string[] urls =
             {
                 "wrongURL",
-                "",
-                "http://google.com"
+                string.Empty                
             };
 
             foreach(var url in urls)
             {   
-                _config["Api:PrivateBankUrl"] = url;
+                _config["Api:PrivatBank:Url"] = url;
 
                 var testDate = new DateTime(2022, 1, 1);
 
@@ -99,7 +91,7 @@ namespace UnitTests
                 Assert.IsNull(result);
             }
 
-            _config["Api:PrivateBankUrl"] = temp;            
+            _config["Api:PrivatBank:Url"] = temp;            
         }
 
         private ExchangeRate GetExchangeRateByName(DailyExchangeRates dayExchangeRates, string name)

@@ -6,8 +6,7 @@ using Bot.Services.Strategies;
 using CacheContext;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
-using API.Common;
-using API.ApiPrivatBank;
+using API.Services.Factory;
 
 namespace UnitTests
 {
@@ -17,31 +16,28 @@ namespace UnitTests
         
         [SetUp]
         public void Setup()
-        {
-            if(_responseProvider is null)
-            {
-                var mockLogger = new Mock<ILogger<ResponseProvider>>();
-                ILogger<ResponseProvider> logger = mockLogger.Object;
+        {            
+            var mockLogger = new Mock<ILogger<ResponseProvider>>();
+            ILogger<ResponseProvider> logger = mockLogger.Object;
 
-                var host = Host.CreateDefaultBuilder()
-                    .ConfigureServices((context, services) => 
-                    {
-                        services.AddMemoryCache();
-                        services.AddScoped<CacheManager>();
-                        services.AddScoped<JsonParserPrivatBank>();
-                    })
-                    .Build();
+            var host = Host.CreateDefaultBuilder()
+                .ConfigureServices((context, services) => 
+                {
+                    services.AddMemoryCache();
+                    services.AddScoped<CacheManager>();
+                    services.AddScoped<JsonParserFactory>();                        
+                })
+                .Build();
 
-                var cacheManager = ActivatorUtilities.CreateInstance<CacheManager>(host.Services);
+            var cacheManager = ActivatorUtilities.CreateInstance<CacheManager>(host.Services);
                 
-                var parser = ActivatorUtilities.CreateInstance<JsonParserPrivatBank>(host.Services);
+            var parser = ActivatorUtilities.CreateInstance<JsonParserFactory>(host.Services);
 
-                _responseProvider = new ResponseProviderSuccessor(logger, cacheManager, parser);
-            }
+            _responseProvider = new ResponseProviderSuccessor(logger, cacheManager, parser);            
         }
 
         [Test]
-        public void TestOfDefineCorrectStrategy()
+        public void Define_CorrectStrategy()
         {
             string[] requests =
             {
@@ -60,7 +56,7 @@ namespace UnitTests
         }
 
         [Test]
-        public void TestOfDefineIncorrectStrategy()
+        public void Define_IncorrectStrategy()
         {
             string[] requests =
             {
@@ -70,7 +66,10 @@ namespace UnitTests
                 "usd 0s1.01.2020",
                 "ud",
                 "us4",
-                "usdd"
+                "usdd",
+                "usd s",
+                "usd tt.tt.tttt",
+                "usd t.t.tttt"
             };
 
             foreach (var r in requests)
@@ -81,7 +80,7 @@ namespace UnitTests
         }
 
         [Test]
-        public void TestOfDefineGreetingStrategy()
+        public void Define_GreetingStrategy()
         {
             string request = Bot.Resources.Commands.StartCommand;
 
@@ -91,7 +90,7 @@ namespace UnitTests
         }
 
         [Test]
-        public void TestOfDefineHelpStrategy()
+        public void Define_HelpStrategy()
         {
             string request = Bot.Resources.Commands.HelpCommand;
 

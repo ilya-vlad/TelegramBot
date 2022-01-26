@@ -1,6 +1,4 @@
-﻿using API.Common;
-using API.Common.Interfaces;
-
+﻿
 namespace Api.ApiPrivatBank.Models
 {
     public class ExchangeRate

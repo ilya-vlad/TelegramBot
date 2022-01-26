@@ -1,6 +1,4 @@
 ﻿using Api.ApiPrivatBank.Models;
-using API.ApiPrivatBank;
-using API.Common;
 using API.Common.Interfaces;
 using CacheContext;
 using System;

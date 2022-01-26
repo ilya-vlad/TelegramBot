@@ -6,7 +6,6 @@ using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.DependencyInjection;
 using Bot.Services;
 using CacheContext;
-using API.Common;
 using API.ApiPrivatBank;
 using API.Common.Interfaces;
 using API.ApiRapid;
@@ -29,8 +28,6 @@ namespace Bot
 
             Log.Logger.Information("Application Starting...");
 
-            
-
             var host = Host.CreateDefaultBuilder()
                 .ConfigureServices((context, services) =>
                 {
@@ -38,21 +35,14 @@ namespace Bot
                     services.AddScoped<CacheManager>();
                     services.AddScoped<ResponseProvider>();
                     services.AddSingleton<TelegramBot>();
-
-
-                    
-
-                    
                     
                     services.AddSingleton<IJsonParserFactory, JsonParserFactory>();
-                    
 
                     services.AddSingleton<JsonParserPrivatBank>()
                             .AddSingleton<IJsonParser, JsonParserPrivatBank>( s => s.GetService<JsonParserPrivatBank>());
 
                     services.AddSingleton<JsonParserRapid>();
-                            services.AddSingleton<IJsonParser, JsonParserRapid>(s => s.GetService<JsonParserRapid>());
-                                 
+                            services.AddSingleton<IJsonParser, JsonParserRapid>(s => s.GetService<JsonParserRapid>());                                 
                 })
                 .UseSerilog()
                 .Build();

@@ -1,6 +1,4 @@
-﻿using API.ApiPrivatBank;
-using API.Common;
-using API.Common.Interfaces;
+﻿using API.Common.Interfaces;
 using API.Services.Factory;
 using Bot.Services.Strategies;
 using CacheContext;

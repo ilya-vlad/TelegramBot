@@ -10,9 +10,6 @@ using RestSharp;
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Text;
-using System.Text.RegularExpressions;
-using System.Threading.Tasks;
 
 namespace API.ApiRapid
 {
@@ -20,6 +17,10 @@ namespace API.ApiRapid
     {
         private readonly ILogger<JsonParserRapid> _logger;
         private readonly IConfiguration _config;
+
+        private const string JsonPropertyRates = "rates";
+        private const string JsonPropertyRate = "rate";
+        private const string JsonPropertyCurrency = "currency";
 
         public JsonParserRapid(ILogger<JsonParserRapid> logger, IConfiguration config)
         {
@@ -54,21 +55,21 @@ namespace API.ApiRapid
                     throw new ArgumentNullException(nameof(apiUrl), "Url api is null.");
                 }
 
-                string headerHost = _config.GetValue<string>("Api:RapidApi:HeadersParameter:x-rapidapi-host");
+                string headerHost = _config.GetValue<string>("Api:RapidApi:HeaderParameters:x-rapidapi-host");
 
                 if (string.IsNullOrEmpty(headerHost))
                 {
                     throw new ArgumentNullException(nameof(headerHost), "Header host is null.");
                 }
 
-                string headerKey = _config.GetValue<string>("Api:RapidApi:HeadersParameter:x-rapidapi-key");
+                string headerKey = _config.GetValue<string>("Api:RapidApi:HeaderParameters:x-rapidapi-key");
 
                 if (string.IsNullOrEmpty(headerKey))
                 {
                     throw new ArgumentNullException(nameof(headerKey), "Header key is null.");
                 }
 
-                var client = new RestClient($"{apiUrl}{date.ToString("yyyy-MM-dd")}");
+                var client = new RestClient($"{apiUrl}{date:yyyy-MM-dd}");
 
                 var request = new RestRequest();
 
@@ -95,26 +96,34 @@ namespace API.ApiRapid
         }
 
         private string GetCorrectJson(string incorrectJson)
-        {           
-            JObject jsonObject = JObject.Parse(incorrectJson);
-            JObject jsonRates = (JObject)jsonObject["rates"];
+        {
+            try
+            {
+                JObject jsonObject = JObject.Parse(incorrectJson);
+                JObject jsonRates = (JObject)jsonObject[JsonPropertyRates];
 
-            jsonObject.Remove("rates");
-            JArray newRates = new JArray();
+                jsonObject.Remove(JsonPropertyRates);
+                JArray newRates = new JArray();
 
-            foreach (JProperty x in (JToken)jsonRates)
-            {               
-                JObject objectCurrency = new JObject();
-                objectCurrency["currency"] = x.Name;
-                objectCurrency["rate"] = x.Value;
-                newRates.Add(objectCurrency);
+                foreach (JProperty x in (JToken)jsonRates)
+                {
+                    JObject objectCurrency = new JObject();
+                    objectCurrency[JsonPropertyCurrency] = x.Name;
+                    objectCurrency[JsonPropertyRate] = x.Value;
+                    newRates.Add(objectCurrency);
+                }
+
+                jsonObject.Add(JsonPropertyRates, newRates);
+
+                var correctJson = JsonConvert.SerializeObject(jsonObject);
+
+                return correctJson;
             }
-
-            jsonObject.Add("rates", newRates);
-
-            var correctJson = JsonConvert.SerializeObject(jsonObject);
-            
-            return correctJson;
+            catch (Exception ex)
+            {
+                _logger.LogCritical(ex.Message);
+                return null;
+            }            
         }
 
         private DailyExchangeRates DeserializeJson(string json)

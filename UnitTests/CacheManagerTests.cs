@@ -24,33 +24,30 @@ namespace UnitTests
 
         [SetUp]
         public void Setup()
-        {
-            if (_cacheManager is null)
-            {
-                var mockLogger = new Mock<ILogger<CacheManager>>();
-                ILogger<CacheManager> logger = mockLogger.Object;
+        {            
+            var mockLogger = new Mock<ILogger<CacheManager>>();
+            ILogger<CacheManager> logger = mockLogger.Object;
 
-                var host = Host.CreateDefaultBuilder()
-                    .ConfigureServices((context, services) => services.AddMemoryCache())
-                    .Build();
+            var host = Host.CreateDefaultBuilder()
+                .ConfigureServices((context, services) => services.AddMemoryCache())
+                .Build();
 
-                _memoryCache = ActivatorUtilities.CreateInstance<MemoryCache>(host.Services);
+            _memoryCache = ActivatorUtilities.CreateInstance<MemoryCache>(host.Services);
                 
-                var copyAppSettings = new Dictionary<string, string>
-                {
-                    {"Cache:StorageTimeInMin", _storageTimeInMin.ToString(CultureInfo.InvariantCulture)}
-                };
+            var copyAppSettings = new Dictionary<string, string>
+            {
+                {"Cache:StorageTimeInMin", _storageTimeInMin.ToString(CultureInfo.InvariantCulture)}
+            };
 
-                _config = new ConfigurationBuilder()
-                    .AddInMemoryCollection(copyAppSettings)
-                    .Build();
+            _config = new ConfigurationBuilder()
+                .AddInMemoryCollection(copyAppSettings)
+                .Build();
 
-                _cacheManager = new CacheManager(logger, _memoryCache, _config);                
-            }
+            _cacheManager = new CacheManager(logger, _memoryCache, _config);            
         }
 
         [Test]
-        public void TestOfAddToCache()
+        public void Add_To_Cache()
         {
             DailyExchangeRates _testItem = new() { Date = GetRandomDate() };
 
@@ -62,7 +59,7 @@ namespace UnitTests
         }
 
         [Test]
-        public void TestOfGetFromCache()
+        public void Get_From_Cache()
         {
             DailyExchangeRates _testItem = new() { Date = GetRandomDate() };
 
@@ -74,7 +71,7 @@ namespace UnitTests
         }
 
         [Test]
-        public void TestOfContains()
+        public void Contains_Method()
         {
             DailyExchangeRates _testItem = new() { Date = GetRandomDate() };
 
@@ -86,7 +83,7 @@ namespace UnitTests
         }
 
         [Test]
-        public void TestOfStorageTimeInCache()
+        public void Check_Time_Storage_In_Cache()
         {
             DailyExchangeRates _testItem = new() { Date = GetRandomDate() };
 

@@ -1,5 +1,4 @@
 ﻿using Api.ApiPrivatBank.Models;
-using API.Common.Interfaces;
 using Microsoft.Extensions.Caching.Memory;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
