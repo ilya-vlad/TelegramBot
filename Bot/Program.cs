@@ -10,6 +10,11 @@ using API.ApiPrivatBank;
 using API.Common.Interfaces;
 using API.ApiRapid;
 using API.Services.Factory;
+using API.ApiPrivatBank.Models;
+using API.ApiRapid.Models;
+using Bot.Models;
+using CacheContext.Models;
+using API.Services.Factory.Models;
 
 namespace Bot
 {
@@ -31,23 +36,48 @@ namespace Bot
             var host = Host.CreateDefaultBuilder()
                 .ConfigureServices((context, services) =>
                 {
-                    services.AddMemoryCache();
+                    services.AddMemoryCache();                    
                     services.AddScoped<CacheManager>();
                     services.AddScoped<ResponseProvider>();
                     services.AddSingleton<TelegramBot>();
                     
-                    services.AddSingleton<IJsonParserFactory, JsonParserFactory>();
+                    services.AddSingleton<ICurrencyDataFactory, CurrencyDataFactory>();
 
-                    services.AddSingleton<JsonParserPrivatBank>()
-                            .AddSingleton<IJsonParser, JsonParserPrivatBank>( s => s.GetService<JsonParserPrivatBank>());
+                    services.AddSingleton<CurrencyDataProviderPrivatBank>();
+                    services.AddSingleton<ICurrencyDataProvider, CurrencyDataProviderPrivatBank>( 
+                        s => s.GetService<CurrencyDataProviderPrivatBank>());
 
-                    services.AddSingleton<JsonParserRapid>();
-                            services.AddSingleton<IJsonParser, JsonParserRapid>(s => s.GetService<JsonParserRapid>());                                 
+                    services.AddSingleton<CurrencyDataProviderRapid>();
+                    services.AddSingleton<ICurrencyDataProvider, CurrencyDataProviderRapid>( 
+                        s => s.GetService<CurrencyDataProviderRapid>());
+
+
+
+                    ApiFactoryOptions optionsFactory = context.Configuration
+                        .GetSection(OptionsKeys.Api).Get<ApiFactoryOptions>();
+
+                    ApiPrivatBankOptions optionsPrivatBank = context.Configuration
+                       .GetSection(OptionsKeys.ApiPrivatBank).Get<ApiPrivatBankOptions>();
+
+                    ApiRapidOptions optionsRapid = context.Configuration
+                        .GetSection(OptionsKeys.ApiRapid).Get<ApiRapidOptions>();
+
+                    TelegramBotOptions optionsBot = context.Configuration
+                        .GetSection(OptionsKeys.Telegram).Get<TelegramBotOptions>();
+
+                    CacheManagerOptions optionsCache = context.Configuration
+                        .GetSection(OptionsKeys.Cache).Get<CacheManagerOptions>();
+
+                    services.AddSingleton(optionsFactory);
+                    services.AddSingleton(optionsPrivatBank);
+                    services.AddSingleton(optionsRapid);
+                    services.AddSingleton(optionsBot);
+                    services.AddSingleton(optionsCache);
                 })
                 .UseSerilog()
                 .Build();
 
-           var tBot = ActivatorUtilities.CreateInstance<TelegramBot>(host.Services);
+            var tBot = ActivatorUtilities.CreateInstance<TelegramBot>(host.Services);
 
             try
             {

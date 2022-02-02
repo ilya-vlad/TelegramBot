@@ -1,10 +1,10 @@
-﻿using Api.ApiPrivatBank.Models;
+﻿using API.Common.Models;
 using System;
 
 
 namespace API.Common.Interfaces
 {
-    public interface IJsonParser
+    public interface ICurrencyDataProvider
     {
         public DailyExchangeRates GetExchangeRates(DateTime date);
     }

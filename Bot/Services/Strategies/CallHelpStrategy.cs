@@ -6,7 +6,7 @@ namespace Bot.Services.Strategies
 {
     public class CallHelpStrategy : BaseResponseStrategy<CallHelpStrategy>
     {
-        public CallHelpStrategy(CacheManager cache, IJsonParser parser)
+        public CallHelpStrategy(CacheManager cache, ICurrencyDataProvider parser)
             : base(cache, parser)
         {
         }

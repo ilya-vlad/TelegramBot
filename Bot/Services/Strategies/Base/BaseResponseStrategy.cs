@@ -7,9 +7,9 @@ namespace Bot.Services.Strategies
     public abstract class BaseResponseStrategy<T> : IResponseStrategy where T : class
     {       
         protected readonly CacheManager _cache;
-        protected readonly IJsonParser _parser;
+        protected readonly ICurrencyDataProvider _parser;
 
-        public BaseResponseStrategy(CacheManager cache, IJsonParser parser)
+        public BaseResponseStrategy(CacheManager cache, ICurrencyDataProvider parser)
         {            
             _cache = cache;
             _parser = parser;            

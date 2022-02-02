@@ -1,5 +1,5 @@
-﻿using Api.ApiPrivatBank.Models;
-using API.Common.Interfaces;
+﻿using API.Common.Interfaces;
+using API.Common.Models;
 using CacheContext;
 using System;
 using System.Linq;
@@ -8,7 +8,7 @@ namespace Bot.Services.Strategies
 {
     public class CorrectRequestStrategy : BaseResponseStrategy<CorrectRequestStrategy>
     {
-        public CorrectRequestStrategy(CacheManager cache, IJsonParser parser)
+        public CorrectRequestStrategy(CacheManager cache, ICurrencyDataProvider parser)
             : base(cache, parser)
         {
         }

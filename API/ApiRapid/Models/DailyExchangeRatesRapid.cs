@@ -8,10 +8,9 @@ namespace API.ApiRapid.Models
     public class DailyExchangeRatesRapid
     {
         public DateTime Date { get; set; }
-        
+
         public int Timestamp { get; set; }
-
-
+        
         [JsonProperty("base")]
         public string BaseCurrency { get; set; }
 
@@ -19,6 +18,6 @@ namespace API.ApiRapid.Models
 
         public bool Historical { get; set; }
 
-        public List<ExchangeRateRapid> Rates { get; set; }
+        public Dictionary<string, double> Rates { get; set; }
     }
 }

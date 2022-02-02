@@ -8,7 +8,7 @@ namespace UnitTests
 {
     public class ResponseProviderSuccessor : ResponseProvider
     {
-        public ResponseProviderSuccessor(ILogger<ResponseProvider> logger, CacheManager cache, IJsonParserFactory parserFactory) 
+        public ResponseProviderSuccessor(ILogger<ResponseProvider> logger, CacheManager cache, ICurrencyDataFactory parserFactory) 
             : base(logger, cache, parserFactory)
         {           
         }

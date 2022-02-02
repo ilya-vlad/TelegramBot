@@ -1,6 +1,6 @@
-﻿using Api.ApiPrivatBank.Models;
+﻿using API.Common.Models;
+using CacheContext.Models;
 using Microsoft.Extensions.Caching.Memory;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 
@@ -10,22 +10,22 @@ namespace CacheContext
     {
         private readonly ILogger<CacheManager> _logger;
         private readonly IMemoryCache _cache;
-        private readonly IConfiguration _config;
+        private readonly CacheManagerOptions _options;
 
         private MemoryCacheEntryOptions options;
 
-        public CacheManager(ILogger<CacheManager> logger, IMemoryCache cache, IConfiguration config)
+        public CacheManager(ILogger<CacheManager> logger, IMemoryCache cache, CacheManagerOptions options)
         {
             _logger = logger;
             _cache = cache;
-            _config = config;
+            _options = options;
 
             SetCacheOptions();
         }
 
         private void SetCacheOptions()
         {
-            double? minutes = _config.GetValue<double>("Cache:StorageTimeInMin");
+            double? minutes = _options.StorageTimeInMin;
 
             minutes = minutes == null ? 60 : minutes;
 

@@ -9,21 +9,22 @@ using Telegram.Bot.Extensions.Polling;
 using Telegram.Bot.Types;
 using Telegram.Bot.Types.Enums;
 using Bot.Services;
+using Bot.Models;
 
 namespace Bot
 {
     internal class TelegramBot
     {
         private TelegramBotClient _telegramBotClient;
-        private readonly IConfiguration _config;
+        private readonly TelegramBotOptions _options;
         private readonly ILogger<TelegramBot> _logger;
         private CancellationTokenSource _cts;
         private readonly ResponseProvider _responseProvider;
        
-        public TelegramBot(ILogger<TelegramBot> logger, IConfiguration config, ResponseProvider responseProvider)
+        public TelegramBot(ILogger<TelegramBot> logger, TelegramBotOptions options, ResponseProvider responseProvider)
         {
             _logger = logger;
-            _config = config;
+            _options = options;
             _responseProvider = responseProvider;
         }
 
@@ -34,7 +35,7 @@ namespace Bot
                 return;
             }
 
-            _telegramBotClient = new TelegramBotClient(_config.GetValue<string>("Telegram:Token"));
+            _telegramBotClient = new TelegramBotClient(_options.Token);
 
             _cts = new CancellationTokenSource();
 

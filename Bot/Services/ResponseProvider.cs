@@ -12,17 +12,17 @@ namespace Bot.Services
     {
         private readonly ILogger<ResponseProvider> _logger;
         private readonly CacheManager _cache;
-        private readonly IJsonParser _parser;
+        private readonly ICurrencyDataProvider _parser;
         private IResponseStrategy _strategy;
 
         private string _currency;
         private DateTime _date;
 
-        public ResponseProvider(ILogger<ResponseProvider> logger, CacheManager cache, IJsonParserFactory parserFactory)
+        public ResponseProvider(ILogger<ResponseProvider> logger, CacheManager cache, ICurrencyDataFactory parserFactory)
         {
             _logger = logger;
             _cache = cache;
-            _parser = parserFactory.GetJsonParser();
+            _parser = parserFactory.GetCurrencyDataProvider();
         }
 
         public string GetResponseMessage(string userText)

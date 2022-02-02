@@ -1,6 +1,6 @@
-﻿using Api.ApiPrivatBank.Models;
-using API.ApiRapid.Models;
+﻿using API.ApiRapid.Models;
 using API.Common.Interfaces;
+using API.Common.Models;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
@@ -13,56 +13,43 @@ using System.Linq;
 
 namespace API.ApiRapid
 {
-    public class JsonParserRapid : IJsonParser
+    public class CurrencyDataProviderRapid : ICurrencyDataProvider
     {
-        private readonly ILogger<JsonParserRapid> _logger;
-        private readonly IConfiguration _config;
+        private readonly ILogger<CurrencyDataProviderRapid> _logger;
+        private readonly ApiRapidOptions _options;
 
-        private const string JsonPropertyRates = "rates";
-        private const string JsonPropertyRate = "rate";
-        private const string JsonPropertyCurrency = "currency";
-
-        public JsonParserRapid(ILogger<JsonParserRapid> logger, IConfiguration config)
+        public CurrencyDataProviderRapid(ILogger<CurrencyDataProviderRapid> logger, ApiRapidOptions options)
         {
             _logger = logger;
-            _config = config;
+            _options = options;
         }
 
         public DailyExchangeRates GetExchangeRates(DateTime date)
-        {
-            string incorrectJson = DownloadJson(date);     
-            
-            if(string.IsNullOrEmpty(incorrectJson))
-            {
-                return null;
-            }            
+        {            
+            string json = DownloadJson(date);
 
-            string correctJson = GetCorrectJson(incorrectJson);
-
-            DailyExchangeRates exchangeRates = DeserializeJson(correctJson);
-
-            return exchangeRates;
+            return string.IsNullOrEmpty(json) ? null : DeserializeJson(json);
         }
 
         private string DownloadJson(DateTime date)
         {
             try
             {
-                string apiUrl = _config.GetValue<string>("Api:RapidApi:Url");
+                string apiUrl = _options.Url;
 
                 if (string.IsNullOrEmpty(apiUrl))
                 {
                     throw new ArgumentNullException(nameof(apiUrl), "Url api is null.");
                 }
 
-                string headerHost = _config.GetValue<string>("Api:RapidApi:HeaderParameters:x-rapidapi-host");
+                string headerHost = _options.HeaderHost;
 
                 if (string.IsNullOrEmpty(headerHost))
                 {
                     throw new ArgumentNullException(nameof(headerHost), "Header host is null.");
                 }
 
-                string headerKey = _config.GetValue<string>("Api:RapidApi:HeaderParameters:x-rapidapi-key");
+                string headerKey = _options.HeaderKey;
 
                 if (string.IsNullOrEmpty(headerKey))
                 {
@@ -93,38 +80,7 @@ namespace API.ApiRapid
                 _logger.LogCritical($"{e.Message}");
                 return null;
             }
-        }
-
-        private string GetCorrectJson(string incorrectJson)
-        {
-            try
-            {
-                JObject jsonObject = JObject.Parse(incorrectJson);
-                JObject jsonRates = (JObject)jsonObject[JsonPropertyRates];
-
-                jsonObject.Remove(JsonPropertyRates);
-                JArray newRates = new JArray();
-
-                foreach (JProperty x in (JToken)jsonRates)
-                {
-                    JObject objectCurrency = new JObject();
-                    objectCurrency[JsonPropertyCurrency] = x.Name;
-                    objectCurrency[JsonPropertyRate] = x.Value;
-                    newRates.Add(objectCurrency);
-                }
-
-                jsonObject.Add(JsonPropertyRates, newRates);
-
-                var correctJson = JsonConvert.SerializeObject(jsonObject);
-
-                return correctJson;
-            }
-            catch (Exception ex)
-            {
-                _logger.LogCritical(ex.Message);
-                return null;
-            }            
-        }
+        }       
 
         private DailyExchangeRates DeserializeJson(string json)
         {
@@ -141,8 +97,8 @@ namespace API.ApiRapid
             List<ExchangeRate> listCurrencies = exchangeRatesRapid.Rates
                .Select(currency => new ExchangeRate()
                {
-                   CurrencyName = currency.CurrencyName,
-                   Rate = 1 / currency.Rate
+                   CurrencyName = currency.Key,
+                   Rate = 1 / currency.Value
                })
                .ToList();
 

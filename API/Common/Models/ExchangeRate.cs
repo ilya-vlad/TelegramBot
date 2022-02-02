@@ -1,5 +1,5 @@
 ﻿
-namespace Api.ApiPrivatBank.Models
+namespace API.Common.Models
 {
     public class ExchangeRate
     {

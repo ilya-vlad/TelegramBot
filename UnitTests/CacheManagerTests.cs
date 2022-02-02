@@ -10,7 +10,7 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using System.Globalization;
 using System.Threading;
-using Api.ApiPrivatBank.Models;
+using API.Common.Models;
 
 namespace UnitTests
 {
@@ -43,7 +43,7 @@ namespace UnitTests
                 .AddInMemoryCollection(copyAppSettings)
                 .Build();
 
-            _cacheManager = new CacheManager(logger, _memoryCache, _config);            
+            //_cacheManager = new CacheManager(logger, _memoryCache, _config);            
         }
 
         [Test]

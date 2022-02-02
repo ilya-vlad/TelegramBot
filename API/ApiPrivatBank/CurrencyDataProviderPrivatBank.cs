@@ -4,22 +4,23 @@ using System;
 using RestSharp;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Api.ApiPrivatBank.Models;
 using API.Common.Interfaces;
 using System.Collections.Generic;
 using System.Linq;
+using API.ApiPrivatBank.Models;
+using API.Common.Models;
 
 namespace API.ApiPrivatBank
 {
-    public class JsonParserPrivatBank : IJsonParser
+    public class CurrencyDataProviderPrivatBank : ICurrencyDataProvider
     {
-        private readonly ILogger<JsonParserPrivatBank> _logger;
-        private readonly IConfiguration _config;
+        private readonly ILogger<CurrencyDataProviderPrivatBank> _logger;
+        private readonly ApiPrivatBankOptions _options;
 
-        public JsonParserPrivatBank(ILogger<JsonParserPrivatBank> logger, IConfiguration config)
+        public CurrencyDataProviderPrivatBank(ILogger<CurrencyDataProviderPrivatBank> logger, ApiPrivatBankOptions options)
         {
             _logger = logger;
-            _config = config;
+            _options = options;
         }
 
         public DailyExchangeRates GetExchangeRates(DateTime date)
@@ -33,7 +34,7 @@ namespace API.ApiPrivatBank
         {
             try
             {
-                string apiUrl = _config.GetValue<string>("Api:PrivatBank:Url");
+                string apiUrl = _options.Url;
 
                 if (string.IsNullOrEmpty(apiUrl))
                 {

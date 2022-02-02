@@ -6,7 +6,7 @@ namespace Bot.Services.Strategies
 {
     public class IncorrectRequestStrategy : BaseResponseStrategy<IncorrectRequestStrategy>
     {
-        public IncorrectRequestStrategy(CacheManager cache, IJsonParser parser)
+        public IncorrectRequestStrategy(CacheManager cache, ICurrencyDataProvider parser)
             : base(cache, parser)
         {
         }

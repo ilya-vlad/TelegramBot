@@ -6,20 +6,20 @@ using Microsoft.Extensions.Configuration;
 using System.Collections.Generic;
 using System.Linq;
 using API.ApiPrivatBank;
-using Api.ApiPrivatBank.Models;
+using API.Common.Models;
 
 namespace UnitTests
 {    
     public class JsonParserPrivatBankTests
     {
-        private JsonParserPrivatBank _parser;
+        private CurrencyDataProviderPrivatBank _parser;
         private IConfiguration _config;
 
         [SetUp]
         public void Setup()
         {           
-            var mockLogger = new Mock<ILogger<JsonParserPrivatBank>>();
-            ILogger<JsonParserPrivatBank> logger = mockLogger.Object;
+            var mockLogger = new Mock<ILogger<CurrencyDataProviderPrivatBank>>();
+            ILogger<CurrencyDataProviderPrivatBank> logger = mockLogger.Object;
 
             var copyAppSettings = new Dictionary<string, string>
             {
@@ -30,7 +30,7 @@ namespace UnitTests
                 .AddInMemoryCollection(copyAppSettings)
                 .Build();
 
-            _parser = new JsonParserPrivatBank(logger, _config);            
+            //_parser = new CurrencyDataProviderPrivatBank(logger, _config);            
         }
 
         [Test]

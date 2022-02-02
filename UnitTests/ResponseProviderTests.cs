@@ -25,13 +25,13 @@ namespace UnitTests
                 {
                     services.AddMemoryCache();
                     services.AddScoped<CacheManager>();
-                    services.AddScoped<JsonParserFactory>();                        
+                    services.AddScoped<CurrencyDataFactory>();                        
                 })
                 .Build();
 
             var cacheManager = ActivatorUtilities.CreateInstance<CacheManager>(host.Services);
                 
-            var parser = ActivatorUtilities.CreateInstance<JsonParserFactory>(host.Services);
+            var parser = ActivatorUtilities.CreateInstance<CurrencyDataFactory>(host.Services);
 
             _responseProvider = new ResponseProviderSuccessor(logger, cacheManager, parser);            
         }

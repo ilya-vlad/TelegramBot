@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace Api.ApiPrivatBank.Models
+namespace API.Common.Models
 {
     public class DailyExchangeRates
     {
