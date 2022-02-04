@@ -6,8 +6,8 @@ namespace Bot.Services.Strategies
 {
     public class CallHelpStrategy : BaseResponseStrategy<CallHelpStrategy>
     {
-        public CallHelpStrategy(CacheManager cache, ICurrencyDataProvider parser)
-            : base(cache, parser)
+        public CallHelpStrategy(ICacheManager cache, ICurrencyDataProvider currencyProvider)
+            : base(cache, currencyProvider)
         {
         }
 

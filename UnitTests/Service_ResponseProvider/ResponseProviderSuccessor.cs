@@ -4,12 +4,12 @@ using Bot.Services.Strategies;
 using CacheContext;
 using Microsoft.Extensions.Logging;
 
-namespace UnitTests
+namespace UnitTests.Service_ResponseProvider
 {
     public class ResponseProviderSuccessor : ResponseProvider
     {
-        public ResponseProviderSuccessor(ILogger<ResponseProvider> logger, CacheManager cache, ICurrencyDataFactory parserFactory) 
-            : base(logger, cache, parserFactory)
+        public ResponseProviderSuccessor(ILogger<ResponseProvider> logger, ICacheManager cache, ICurrencyDataFactory currencyFactory) 
+            : base(logger, cache, currencyFactory)
         {           
         }
         

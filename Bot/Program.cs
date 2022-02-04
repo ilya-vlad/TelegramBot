@@ -15,6 +15,7 @@ using API.ApiRapid.Models;
 using Bot.Models;
 using CacheContext.Models;
 using API.Services.Factory.Models;
+using RestSharp;
 
 namespace Bot
 {
@@ -37,9 +38,11 @@ namespace Bot
                 .ConfigureServices((context, services) =>
                 {
                     services.AddMemoryCache();                    
-                    services.AddScoped<CacheManager>();
+                    services.AddScoped<ICacheManager, CacheManager>();
                     services.AddScoped<ResponseProvider>();
                     services.AddSingleton<TelegramBot>();
+
+                    services.AddScoped<IRestClient, RestClient>();
                     
                     services.AddSingleton<ICurrencyDataFactory, CurrencyDataFactory>();
 

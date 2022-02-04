@@ -16,67 +16,66 @@ namespace API.ApiPrivatBank
     {
         private readonly ILogger<CurrencyDataProviderPrivatBank> _logger;
         private readonly ApiPrivatBankOptions _options;
+        private readonly IRestClient _client;
 
-        public CurrencyDataProviderPrivatBank(ILogger<CurrencyDataProviderPrivatBank> logger, ApiPrivatBankOptions options)
+        public CurrencyDataProviderPrivatBank(
+            ILogger<CurrencyDataProviderPrivatBank> logger, 
+            ApiPrivatBankOptions options, 
+            IRestClient client)
         {
             _logger = logger;
             _options = options;
-        }
+            _client = client;
+        }       
 
         public DailyExchangeRates GetExchangeRates(DateTime date)
         {
-            string json = DownloadJson(date);
+            DailyExchangeRates result = null;
 
-            return string.IsNullOrEmpty(json) ? null : DeserializeJson(json);
-        }
+            var request = new RestRequest();
 
-        private string DownloadJson(DateTime date)
-        {
-            try
+            request.AddQueryParameter("date", date.ToString("dd.MM.yyyy"));
+
+            var queryResult = MakeRequest(request);
+            _logger.LogInformation($"Downloaded JSON from API PrivatBank. Url: {queryResult.ResponseUri}");
+
+            if (queryResult.ResponseStatus == ResponseStatus.Completed)
             {
-                string apiUrl = _options.Url;
-
-                if (string.IsNullOrEmpty(apiUrl))
+                try
                 {
-                    throw new ArgumentNullException(nameof(apiUrl), "Url api is null.");
-                }               
-
-                var client = new RestClient(apiUrl);
-                
-                var request = new RestRequest();
-
-                request.AddQueryParameter("date", date.ToString("dd.MM.yyyy"));
-
-                var queryResult = client.ExecuteAsync(request).Result;
-
-                if (queryResult.ResponseStatus == ResponseStatus.Completed)
-                {
-                    _logger.LogInformation($"Downloaded JSON from API PrivatBank. Url: {queryResult.ResponseUri}");
-                    return queryResult.Content;
+                    result = DeserializeJson(queryResult.Content);
                 }
+                catch (Exception ex)
+                {
+                    _logger.LogCritical($"{ex.Message}");
+                    return result;
+                }               
+            }            
 
-                return null;
-            }
-            catch (Exception e)
-            {
-                _logger.LogCritical($"{e.Message}");
-                return null;
-            }
+            return result;
+        } 
+
+        private IRestResponse MakeRequest(RestRequest request)
+        {
+            _client.BaseUrl = new Uri(_options.Url);
+
+            return _client.Execute(request);
         }
 
         private DailyExchangeRates DeserializeJson(string json)
         {
-            DailyExchangeRatesPrivateBank exchangeRatesPrivateBank = JsonConvert.DeserializeObject<DailyExchangeRatesPrivateBank>(json,
-                new IsoDateTimeConverter { DateTimeFormat = "dd.MM.yyyy" });
+            DailyExchangeRatesPrivatBank exchangeRatesPrivatBank = 
+                JsonConvert.DeserializeObject<DailyExchangeRatesPrivatBank>
+                (json, new IsoDateTimeConverter { DateTimeFormat = "dd.MM.yyyy" });
 
-            DailyExchangeRates exchangeRates = ConvertToDailyExchangeRates(exchangeRatesPrivateBank);
+            DailyExchangeRates exchangeRates = ConvertToDailyExchangeRates(exchangeRatesPrivatBank);
 
             return exchangeRates;
         }
 
-        private DailyExchangeRates ConvertToDailyExchangeRates(DailyExchangeRatesPrivateBank exchangeRatesPrivateBank)
+        private DailyExchangeRates ConvertToDailyExchangeRates(DailyExchangeRatesPrivatBank exchangeRatesPrivatBank)
         {
-            List<ExchangeRate> listCurrencies = exchangeRatesPrivateBank.ExchangeRates
+            List<ExchangeRate> listCurrencies = exchangeRatesPrivatBank.ExchangeRates
                 .Select(currency => new ExchangeRate() 
                 { 
                     CurrencyName = currency.Currency, 
@@ -86,8 +85,8 @@ namespace API.ApiPrivatBank
 
             DailyExchangeRates exchangeRates = new()
             {
-                Date = exchangeRatesPrivateBank.Date,
-                BaseCurrencyName = exchangeRatesPrivateBank.BaseCurrencyLit,
+                Date = exchangeRatesPrivatBank.Date,
+                BaseCurrencyName = exchangeRatesPrivatBank.BaseCurrencyLit,
                 ExchangeRates = listCurrencies
             };
 

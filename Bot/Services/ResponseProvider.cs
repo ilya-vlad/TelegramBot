@@ -11,18 +11,18 @@ namespace Bot.Services
     public class ResponseProvider
     {
         private readonly ILogger<ResponseProvider> _logger;
-        private readonly CacheManager _cache;
-        private readonly ICurrencyDataProvider _parser;
+        private readonly ICacheManager _cache;
+        private readonly ICurrencyDataProvider _currencyProvider;
         private IResponseStrategy _strategy;
 
         private string _currency;
         private DateTime _date;
 
-        public ResponseProvider(ILogger<ResponseProvider> logger, CacheManager cache, ICurrencyDataFactory parserFactory)
+        public ResponseProvider(ILogger<ResponseProvider> logger, ICacheManager cache, ICurrencyDataFactory currencyFactory)
         {
             _logger = logger;
             _cache = cache;
-            _parser = parserFactory.GetCurrencyDataProvider();
+            _currencyProvider = currencyFactory.GetCurrencyDataProvider();
         }
 
         public string GetResponseMessage(string userText)
@@ -43,26 +43,26 @@ namespace Bot.Services
         {
             if (userText.Equals(Resources.Commands.StartCommand))
             {
-                return new GreetingStrategy(_cache, _parser);
+                return new GreetingStrategy(_cache, _currencyProvider);
             }
             else if (userText.Equals(Resources.Commands.HelpCommand))
             {
-                return new CallHelpStrategy(_cache, _parser);
+                return new CallHelpStrategy(_cache, _currencyProvider);
             }    
             //other strategies
 
             try
             {
                 return IsValidInput(userText) == true 
-                    ? new CorrectRequestStrategy(_cache, _parser) 
-                    : new IncorrectRequestStrategy(_cache, _parser);               
+                    ? new CorrectRequestStrategy(_cache, _currencyProvider) 
+                    : new IncorrectRequestStrategy(_cache, _currencyProvider);               
             }
             catch(Exception ex)
             {
                 _logger.LogCritical($"{ex.Message}");
             }
 
-            return new IncorrectRequestStrategy(_cache, _parser);
+            return new IncorrectRequestStrategy(_cache, _currencyProvider);
         }
 
         private bool IsValidInput(string userText)

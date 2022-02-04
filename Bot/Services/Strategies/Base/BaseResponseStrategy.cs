@@ -6,13 +6,13 @@ namespace Bot.Services.Strategies
 {
     public abstract class BaseResponseStrategy<T> : IResponseStrategy where T : class
     {       
-        protected readonly CacheManager _cache;
-        protected readonly ICurrencyDataProvider _parser;
+        protected readonly ICacheManager _cache;
+        protected readonly ICurrencyDataProvider _currencyProvider;
 
-        public BaseResponseStrategy(CacheManager cache, ICurrencyDataProvider parser)
+        public BaseResponseStrategy(ICacheManager cache, ICurrencyDataProvider currencyProvider)
         {            
             _cache = cache;
-            _parser = parser;            
+            _currencyProvider = currencyProvider;            
         }
 
         public abstract string GetResponse(string currency, DateTime date);

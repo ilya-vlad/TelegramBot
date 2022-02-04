@@ -4,7 +4,7 @@ using System.Collections.Generic;
 
 namespace API.ApiPrivatBank.Models
 {
-    public class DailyExchangeRatesPrivateBank
+    public class DailyExchangeRatesPrivatBank
     {
         public DateTime Date { get ; set; }
 
@@ -16,6 +16,6 @@ namespace API.ApiPrivatBank.Models
 
 
         [JsonProperty("ExchangeRate")]
-        public List<ExchangeRatePrivateBank> ExchangeRates { get; set; }
+        public List<ExchangeRatePrivatBank> ExchangeRates { get; set; }
     }
 }

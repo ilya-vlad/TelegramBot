@@ -17,75 +17,59 @@ namespace API.ApiRapid
     {
         private readonly ILogger<CurrencyDataProviderRapid> _logger;
         private readonly ApiRapidOptions _options;
+        private readonly IRestClient _client;
 
-        public CurrencyDataProviderRapid(ILogger<CurrencyDataProviderRapid> logger, ApiRapidOptions options)
+        public CurrencyDataProviderRapid(
+            ILogger<CurrencyDataProviderRapid> logger,
+            ApiRapidOptions options, 
+            IRestClient client)
         {
             _logger = logger;
             _options = options;
+            _client = client;
         }
 
         public DailyExchangeRates GetExchangeRates(DateTime date)
-        {            
-            string json = DownloadJson(date);
+        {
+            DailyExchangeRates result = null;
 
-            return string.IsNullOrEmpty(json) ? null : DeserializeJson(json);
+            var request = new RestRequest($"{date:yyyy-MM-dd}");
+            
+            request.AddQueryParameter("base", "UAH");
+            request.AddHeader("x-rapidapi-host", _options.HeaderHost);
+            request.AddHeader("x-rapidapi-key", _options.HeaderKey);
+
+            var queryResult = MakeRequest(request);
+            _logger.LogInformation($"Downloaded JSON from RapidApi. Url: {queryResult.ResponseUri}");
+
+            if (queryResult.ResponseStatus == ResponseStatus.Completed)
+            {
+                try
+                {
+                    result = DeserializeJson(queryResult.Content);
+                }
+                catch (Exception ex)
+                {
+                    _logger.LogCritical($"{ex.Message}");
+                    return result;
+                }
+            }
+
+            return result;
         }
 
-        private string DownloadJson(DateTime date)
+        private IRestResponse MakeRequest(RestRequest request)
         {
-            try
-            {
-                string apiUrl = _options.Url;
+            _client.BaseUrl = new Uri(_options.Url);
 
-                if (string.IsNullOrEmpty(apiUrl))
-                {
-                    throw new ArgumentNullException(nameof(apiUrl), "Url api is null.");
-                }
-
-                string headerHost = _options.HeaderHost;
-
-                if (string.IsNullOrEmpty(headerHost))
-                {
-                    throw new ArgumentNullException(nameof(headerHost), "Header host is null.");
-                }
-
-                string headerKey = _options.HeaderKey;
-
-                if (string.IsNullOrEmpty(headerKey))
-                {
-                    throw new ArgumentNullException(nameof(headerKey), "Header key is null.");
-                }
-
-                var client = new RestClient($"{apiUrl}{date:yyyy-MM-dd}");
-
-                var request = new RestRequest();
-
-                request.AddQueryParameter("base", "UAH");
-                request.AddHeader("x-rapidapi-host", headerHost);
-                request.AddHeader("x-rapidapi-key", headerKey);
-
-
-                var queryResult = client.ExecuteAsync(request).Result;
-
-                if (queryResult.ResponseStatus == ResponseStatus.Completed)
-                {
-                    _logger.LogInformation($"Downloaded JSON from RapiAPI. Url: {queryResult.ResponseUri}");
-                    return queryResult.Content;
-                }
-
-                return null;
-            }
-            catch (Exception e)
-            {
-                _logger.LogCritical($"{e.Message}");
-                return null;
-            }
-        }       
+            return _client.Execute(request);
+        }
 
         private DailyExchangeRates DeserializeJson(string json)
         {
-            DailyExchangeRatesRapid exchangeRatesRapid = JsonConvert.DeserializeObject<DailyExchangeRatesRapid>(json,
-                new IsoDateTimeConverter { DateTimeFormat = "yyyy-MM-dd" });
+            DailyExchangeRatesRapid exchangeRatesRapid = 
+                JsonConvert.DeserializeObject<DailyExchangeRatesRapid>
+                (json, new IsoDateTimeConverter { DateTimeFormat = "yyyy-MM-dd" });
 
             DailyExchangeRates exchangeRates = ConvertToDailyExchangeRates(exchangeRatesRapid);
 

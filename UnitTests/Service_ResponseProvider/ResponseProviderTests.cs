@@ -8,32 +8,22 @@ using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using API.Services.Factory;
 
-namespace UnitTests
+namespace UnitTests.Service_ResponseProvider
 {
     public class ResponseProviderTests 
     {
-        private ResponseProviderSuccessor _responseProvider;
-        
-        [SetUp]
-        public void Setup()
+        public ResponseProviderSuccessor GetResponseProvider()
         {            
             var mockLogger = new Mock<ILogger<ResponseProvider>>();
             ILogger<ResponseProvider> logger = mockLogger.Object;
 
-            var host = Host.CreateDefaultBuilder()
-                .ConfigureServices((context, services) => 
-                {
-                    services.AddMemoryCache();
-                    services.AddScoped<CacheManager>();
-                    services.AddScoped<CurrencyDataFactory>();                        
-                })
-                .Build();
+            var mockCache = new Mock<ICacheManager>();
+            ICacheManager cacheManager = mockCache.Object;
 
-            var cacheManager = ActivatorUtilities.CreateInstance<CacheManager>(host.Services);
-                
-            var parser = ActivatorUtilities.CreateInstance<CurrencyDataFactory>(host.Services);
+            var mockFactory = new Mock<ICurrencyDataFactory>();
+            ICurrencyDataFactory factory = mockFactory.Object;
 
-            _responseProvider = new ResponseProviderSuccessor(logger, cacheManager, parser);            
+            return new ResponseProviderSuccessor(logger, cacheManager, factory);
         }
 
         [Test]
@@ -48,9 +38,11 @@ namespace UnitTests
                 "usd"
             };
 
+            ResponseProviderSuccessor provider = GetResponseProvider();
+
             foreach(var r in requests)
             {
-                var strategy = _responseProvider.GetStrategyTestMethod(r);                
+                var strategy = provider.GetStrategyTestMethod(r);                
                 Assert.IsTrue(strategy is CorrectRequestStrategy);
             }
         }
@@ -72,9 +64,11 @@ namespace UnitTests
                 "usd t.t.tttt"
             };
 
+            ResponseProviderSuccessor provider = GetResponseProvider();
+
             foreach (var r in requests)
             {
-                var strategy = _responseProvider.GetStrategyTestMethod(r);
+                var strategy = provider.GetStrategyTestMethod(r);
                 Assert.IsTrue(strategy is IncorrectRequestStrategy);
             }
         }
@@ -84,7 +78,9 @@ namespace UnitTests
         {
             string request = Bot.Resources.Commands.StartCommand;
 
-            var strategy = _responseProvider.GetStrategyTestMethod(request);
+            ResponseProviderSuccessor provider = GetResponseProvider();
+
+            var strategy = provider.GetStrategyTestMethod(request);
 
             Assert.IsTrue(strategy is GreetingStrategy);
         }
@@ -94,7 +90,9 @@ namespace UnitTests
         {
             string request = Bot.Resources.Commands.HelpCommand;
 
-            var strategy = _responseProvider.GetStrategyTestMethod(request);
+            ResponseProviderSuccessor provider = GetResponseProvider();
+
+            var strategy = provider.GetStrategyTestMethod(request);
 
             Assert.IsTrue(strategy is CallHelpStrategy);
         }

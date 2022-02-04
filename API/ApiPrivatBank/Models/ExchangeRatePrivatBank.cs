@@ -2,7 +2,7 @@
 
 namespace API.ApiPrivatBank.Models
 {
-    public class ExchangeRatePrivateBank
+    public class ExchangeRatePrivatBank
     {
         public string BaseCurrency { get; set; }
 

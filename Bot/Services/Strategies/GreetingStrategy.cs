@@ -6,8 +6,8 @@ namespace Bot.Services.Strategies
 {
     public class GreetingStrategy : BaseResponseStrategy<GreetingStrategy>
     {
-        public GreetingStrategy(CacheManager cache, ICurrencyDataProvider parser) 
-            : base(cache, parser)
+        public GreetingStrategy(ICacheManager cache, ICurrencyDataProvider currencyProvider) 
+            : base(cache, currencyProvider)
         {
         }
 

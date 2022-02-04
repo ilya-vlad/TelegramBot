@@ -6,7 +6,7 @@ using System;
 
 namespace CacheContext
 {
-    public class CacheManager
+    public class CacheManager : ICacheManager
     {
         private readonly ILogger<CacheManager> _logger;
         private readonly IMemoryCache _cache;
@@ -21,15 +21,6 @@ namespace CacheContext
             _options = options;
 
             SetCacheOptions();
-        }
-
-        private void SetCacheOptions()
-        {
-            double? minutes = _options.StorageTimeInMin;
-
-            minutes = minutes == null ? 60 : minutes;
-
-            options = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(minutes.Value));
         }
 
         public void Add(DailyExchangeRates exchangeRates)
@@ -59,5 +50,14 @@ namespace CacheContext
         }
 
         public bool Contains(DateTime date) => _cache.TryGetValue(date.Date, out _);
+
+        private void SetCacheOptions()
+        {
+            double? minutes = _options.StorageTimeInMin;
+
+            minutes = minutes == null ? 60 : minutes;
+
+            options = new MemoryCacheEntryOptions().SetAbsoluteExpiration(TimeSpan.FromMinutes(minutes.Value));
+        }
     }
 }

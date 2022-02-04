@@ -8,8 +8,8 @@ namespace Bot.Services.Strategies
 {
     public class CorrectRequestStrategy : BaseResponseStrategy<CorrectRequestStrategy>
     {
-        public CorrectRequestStrategy(CacheManager cache, ICurrencyDataProvider parser)
-            : base(cache, parser)
+        public CorrectRequestStrategy(ICacheManager cache, ICurrencyDataProvider currencyProvider)
+            : base(cache, currencyProvider)
         {
         }
 
@@ -19,7 +19,7 @@ namespace Bot.Services.Strategies
 
             if (!_cache.Contains(date))
             {
-                exchangeRates = _parser.GetExchangeRates(date);
+                exchangeRates = _currencyProvider.GetExchangeRates(date);
                 _cache.Add(exchangeRates);
             }
             else
