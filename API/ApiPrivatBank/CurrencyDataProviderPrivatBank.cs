@@ -1,5 +1,4 @@
-﻿using Microsoft.Extensions.Configuration;
-using Microsoft.Extensions.Logging;
+﻿using Microsoft.Extensions.Logging;
 using System;
 using RestSharp;
 using Newtonsoft.Json;
@@ -18,6 +17,9 @@ namespace API.ApiPrivatBank
         private readonly ApiPrivatBankOptions _options;
         private readonly IRestClient _client;
 
+        private const string NameOfDataParameter = "date";
+        private const string DateFormat = "dd.MM.yyyy";
+
         public CurrencyDataProviderPrivatBank(
             ILogger<CurrencyDataProviderPrivatBank> logger, 
             ApiPrivatBankOptions options, 
@@ -34,7 +36,7 @@ namespace API.ApiPrivatBank
 
             var request = new RestRequest();
 
-            request.AddQueryParameter("date", date.ToString("dd.MM.yyyy"));
+            request.AddQueryParameter(NameOfDataParameter, date.ToString(DateFormat));
 
             var queryResult = MakeRequest(request);
             _logger.LogInformation($"Downloaded JSON from API PrivatBank. Url: {queryResult.ResponseUri}");
@@ -45,11 +47,26 @@ namespace API.ApiPrivatBank
                 {
                     result = DeserializeJson(queryResult.Content);
                 }
+                catch (NullReferenceException ex)
+                {
+                    _logger.LogError($"Json is empty.\n{ex.Message}");
+                }
+                catch (FormatException ex)
+                {
+                    _logger.LogError($"Json is not in a valid format.\n{ex.Message}");
+                }
+                catch (JsonSerializationException ex)
+                {
+                    _logger.LogError($"Json integrity broken.\n{ex.Message}");
+                }
+                catch (JsonReaderException ex)
+                {
+                    _logger.LogError($"Failed to read JSON.\n{ex.Message}");
+                }
                 catch (Exception ex)
                 {
-                    _logger.LogCritical($"{ex.Message}");
-                    return result;
-                }               
+                    _logger.LogError($"{ex.Message}");
+                }
             }            
 
             return result;
@@ -63,10 +80,10 @@ namespace API.ApiPrivatBank
         }
 
         private DailyExchangeRates DeserializeJson(string json)
-        {
+        {   
             DailyExchangeRatesPrivatBank exchangeRatesPrivatBank = 
                 JsonConvert.DeserializeObject<DailyExchangeRatesPrivatBank>
-                (json, new IsoDateTimeConverter { DateTimeFormat = "dd.MM.yyyy" });
+                (json, new IsoDateTimeConverter { DateTimeFormat = DateFormat });
 
             DailyExchangeRates exchangeRates = ConvertToDailyExchangeRates(exchangeRatesPrivatBank);
 

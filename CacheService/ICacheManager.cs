@@ -1,5 +1,4 @@
-﻿
-using API.Common.Models;
+﻿using API.Common.Models;
 using System;
 
 namespace CacheContext

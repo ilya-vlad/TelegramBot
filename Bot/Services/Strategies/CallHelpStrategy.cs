@@ -4,7 +4,7 @@ using System;
 
 namespace Bot.Services.Strategies
 {
-    public class CallHelpStrategy : BaseResponseStrategy<CallHelpStrategy>
+    public class CallHelpStrategy : BaseResponseStrategy
     {
         public CallHelpStrategy(ICacheManager cache, ICurrencyDataProvider currencyProvider)
             : base(cache, currencyProvider)

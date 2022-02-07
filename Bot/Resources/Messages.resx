@@ -120,6 +120,9 @@
   <data name="CurrencyUAH" xml:space="preserve">
     <value>UAH</value>
   </data>
+  <data name="ErrorGettingData" xml:space="preserve">
+    <value>Error getting data.</value>
+  </data>
   <data name="ExampleRequest" xml:space="preserve">
     <value>Example: "usd 10.10.2020" or "usd"</value>
   </data>
@@ -142,5 +145,8 @@
   </data>
   <data name="TryAgain" xml:space="preserve">
     <value>Please, try again :)</value>
+  </data>
+  <data name="UnknownError" xml:space="preserve">
+    <value>Unknown error.</value>
   </data>
 </root>

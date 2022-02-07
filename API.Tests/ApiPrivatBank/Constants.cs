@@ -1,6 +1,4 @@
-﻿
-
-namespace UnitTests.ApiPrivatBank
+﻿namespace API.Tests
 {
     static public class Constants
     {

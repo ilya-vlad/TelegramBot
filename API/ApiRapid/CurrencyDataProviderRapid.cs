@@ -1,11 +1,9 @@
 ﻿using API.ApiRapid.Models;
 using API.Common.Interfaces;
 using API.Common.Models;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using Newtonsoft.Json;
 using Newtonsoft.Json.Converters;
-using Newtonsoft.Json.Linq;
 using RestSharp;
 using System;
 using System.Collections.Generic;
@@ -18,6 +16,12 @@ namespace API.ApiRapid
         private readonly ILogger<CurrencyDataProviderRapid> _logger;
         private readonly ApiRapidOptions _options;
         private readonly IRestClient _client;
+
+        private const string DateFormat = "yyyy-MM-dd";
+        private const string QueryNameParam = "base";
+        private const string BaseCurrency = "UAH";
+        private const string HeaderHostNameParam = "x-rapidapi-host";
+        private const string HeaderKeyNameParam = "x-rapidapi-key";
 
         public CurrencyDataProviderRapid(
             ILogger<CurrencyDataProviderRapid> logger,
@@ -33,11 +37,11 @@ namespace API.ApiRapid
         {
             DailyExchangeRates result = null;
 
-            var request = new RestRequest($"{date:yyyy-MM-dd}");
+            var request = new RestRequest($"{date.ToString(DateFormat)}");
             
-            request.AddQueryParameter("base", "UAH");
-            request.AddHeader("x-rapidapi-host", _options.HeaderHost);
-            request.AddHeader("x-rapidapi-key", _options.HeaderKey);
+            request.AddQueryParameter(QueryNameParam, BaseCurrency);
+            request.AddHeader(HeaderHostNameParam, _options.HeaderHost);
+            request.AddHeader(HeaderKeyNameParam, _options.HeaderKey);
 
             var queryResult = MakeRequest(request);
             _logger.LogInformation($"Downloaded JSON from RapidApi. Url: {queryResult.ResponseUri}");
@@ -48,10 +52,25 @@ namespace API.ApiRapid
                 {
                     result = DeserializeJson(queryResult.Content);
                 }
+                catch (NullReferenceException ex)
+                {
+                    _logger.LogError($"Json is empty.\n{ex.Message}");
+                }
+                catch (FormatException ex)
+                {
+                    _logger.LogError($"Json is not in a valid format.\n{ex.Message}");
+                }
+                catch (JsonSerializationException ex )
+                {
+                    _logger.LogError($"Json integrity broken.\n{ex.Message}");
+                }
+                catch(JsonReaderException ex)
+                {
+                    _logger.LogError($"Failed to read JSON.\n{ex.Message}");
+                }                
                 catch (Exception ex)
                 {
-                    _logger.LogCritical($"{ex.Message}");
-                    return result;
+                    _logger.LogError($"{ex.Message}");
                 }
             }
 
@@ -66,10 +85,10 @@ namespace API.ApiRapid
         }
 
         private DailyExchangeRates DeserializeJson(string json)
-        {
+        {            
             DailyExchangeRatesRapid exchangeRatesRapid = 
                 JsonConvert.DeserializeObject<DailyExchangeRatesRapid>
-                (json, new IsoDateTimeConverter { DateTimeFormat = "yyyy-MM-dd" });
+                (json, new IsoDateTimeConverter { DateTimeFormat = DateFormat });
 
             DailyExchangeRates exchangeRates = ConvertToDailyExchangeRates(exchangeRatesRapid);
 

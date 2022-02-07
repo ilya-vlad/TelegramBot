@@ -55,7 +55,6 @@ namespace Bot
                         s => s.GetService<CurrencyDataProviderRapid>());
 
 
-
                     ApiFactoryOptions optionsFactory = context.Configuration
                         .GetSection(OptionsKeys.Api).Get<ApiFactoryOptions>();
 

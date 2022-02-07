@@ -31,11 +31,26 @@ namespace Bot.Services
 
             _logger.LogInformation($"Set {_strategy.GetType().Name}");
 
-            string response = _strategy.GetResponse(_currency, _date);
+            string response;
 
-            return $"{response}\n\n" +
-                $"{Resources.Messages.TryAgain}\n" +
-                $"{Resources.Messages.ExampleRequest}";
+            try
+            {
+                response = _strategy.GetResponse(_currency, _date);
+                response += $"\n\n{Resources.Messages.TryAgain}\n" +
+                            $"{Resources.Messages.ExampleRequest}";
+            }
+            catch(NullReferenceException ex)
+            {                
+                response = Resources.Messages.ErrorGettingData;
+                _logger.LogError($"{response}\n{ex.Message}");
+            }
+            catch (Exception ex)
+            {
+                response = Resources.Messages.UnknownError;
+                _logger.LogError($"{response}\n{ex.Message}");
+            }
+
+            return response;
         }
 
 

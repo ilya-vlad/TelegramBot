@@ -4,7 +4,7 @@ using System;
 
 namespace Bot.Services.Strategies
 {
-    public class IncorrectRequestStrategy : BaseResponseStrategy<IncorrectRequestStrategy>
+    public class IncorrectRequestStrategy : BaseResponseStrategy
     {
         public IncorrectRequestStrategy(ICacheManager cache, ICurrencyDataProvider currencyProvider)
             : base(cache, currencyProvider)

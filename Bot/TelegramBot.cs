@@ -57,10 +57,10 @@ namespace Bot
 
         private async Task HandleUpdateAsync(ITelegramBotClient botClient, Update update, CancellationToken cancellationToken)
         {
-            if (update.Type != UpdateType.Message)
-                return;            
-            if (update.Message!.Type != MessageType.Text)
+            if (update.Type != UpdateType.Message || update.Message!.Type != MessageType.Text)
+            {
                 return;
+            }
 
             var chatId = update.Message.Chat.Id;
             var messageText = update.Message.Text;
@@ -69,7 +69,7 @@ namespace Bot
 
             string response = _responseProvider.GetResponseMessage(messageText);            
 
-            Message sentMessage = await botClient.SendTextMessageAsync(
+            await botClient.SendTextMessageAsync(
                 chatId: chatId,
                 text: response,
                 cancellationToken: cancellationToken);

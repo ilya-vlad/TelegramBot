@@ -4,7 +4,7 @@ using System;
 
 namespace Bot.Services.Strategies
 {
-    public class GreetingStrategy : BaseResponseStrategy<GreetingStrategy>
+    public class GreetingStrategy : BaseResponseStrategy
     {
         public GreetingStrategy(ICacheManager cache, ICurrencyDataProvider currencyProvider) 
             : base(cache, currencyProvider)

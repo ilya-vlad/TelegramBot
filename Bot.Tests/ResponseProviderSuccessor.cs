@@ -4,7 +4,7 @@ using Bot.Services.Strategies;
 using CacheContext;
 using Microsoft.Extensions.Logging;
 
-namespace UnitTests.Service_ResponseProvider
+namespace Bot.Tests
 {
     public class ResponseProviderSuccessor : ResponseProvider
     {

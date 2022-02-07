@@ -2,16 +2,14 @@
 using Moq;
 using System;
 using Microsoft.Extensions.Logging;
-using System.Collections.Generic;
 using System.Linq;
 using API.ApiPrivatBank;
-using API.Common.Models;
 using API.ApiPrivatBank.Models;
 using RestSharp;
 
-namespace UnitTests.ApiPrivatBank
+namespace API.Tests
 {    
-    public class ApiPrivatBankTests
+    public class CurrencyDataProviderPrivatBankTests
     {     
         public CurrencyDataProviderPrivatBank GetProvider(IRestResponse response)
         {           
@@ -35,7 +33,7 @@ namespace UnitTests.ApiPrivatBank
 
 
         [Test]
-        public void Valid_Json()
+        public void GetExchangeRates_ValidJson_ReturnsCorrectModelCurrencyData()
         {
             IRestResponse response = new RestResponse()
             {
@@ -44,7 +42,6 @@ namespace UnitTests.ApiPrivatBank
             };
 
             CurrencyDataProviderPrivatBank provider = GetProvider(response);
-
             var answer = provider.GetExchangeRates(new DateTime(2022, 2, 4));
 
             Assert.IsNotNull(answer);
@@ -55,7 +52,7 @@ namespace UnitTests.ApiPrivatBank
         }
 
         [Test]
-        public void ResponseStatus_IsError()
+        public void GetExchangeRates_ResponseStatusIsError_ReturnsNull()
         { 
             IRestResponse response = new RestResponse()
             {
@@ -64,14 +61,13 @@ namespace UnitTests.ApiPrivatBank
             };
 
             CurrencyDataProviderPrivatBank provider = GetProvider(response);
-
             var answer = provider.GetExchangeRates(new DateTime(2022, 2, 4));
 
             Assert.IsNull(answer);            
         }
 
         [Test]
-        public void Broken_Structure_Json()
+        public void GetExchangeRates_BrokenStructureJson_ReturnsNull()
         {
             IRestResponse response = new RestResponse()
             {
@@ -80,14 +76,13 @@ namespace UnitTests.ApiPrivatBank
             };
 
             CurrencyDataProviderPrivatBank provider = GetProvider(response);
-
             var answer = provider.GetExchangeRates(new DateTime(2022, 2, 4));
 
             Assert.IsNull(answer);
         }
 
         [Test] 
-        public void Empty_Json()
+        public void GetExchangeRates_EmptyJson_ReturnsNull()
         {
             IRestResponse response = new RestResponse()
             {
@@ -96,14 +91,13 @@ namespace UnitTests.ApiPrivatBank
             };
 
             CurrencyDataProviderPrivatBank provider = GetProvider(response);
-
             var answer = provider.GetExchangeRates(new DateTime(2022, 2, 4));
 
             Assert.IsNull(answer);
         }
 
         [Test]
-        public void Empty_One_Value()
+        public void GetExchangeRates_OneEmptyValueInJson_ReturnsNull()
         {
             IRestResponse response = new RestResponse()
             {
@@ -112,7 +106,6 @@ namespace UnitTests.ApiPrivatBank
             };
 
             CurrencyDataProviderPrivatBank provider = GetProvider(response);
-
             var answer = provider.GetExchangeRates(new DateTime(2022, 2, 4));
 
             Assert.IsNull(answer);

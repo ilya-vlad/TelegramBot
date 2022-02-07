@@ -4,7 +4,7 @@ using System;
 
 namespace Bot.Services.Strategies
 {
-    public abstract class BaseResponseStrategy<T> : IResponseStrategy where T : class
+    public abstract class BaseResponseStrategy : IResponseStrategy
     {       
         protected readonly ICacheManager _cache;
         protected readonly ICurrencyDataProvider _currencyProvider;

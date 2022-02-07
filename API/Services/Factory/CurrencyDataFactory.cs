@@ -2,7 +2,6 @@
 using API.ApiRapid;
 using API.Common.Interfaces;
 using API.Services.Factory.Models;
-using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.Logging;
 using System;
 
@@ -25,19 +24,12 @@ namespace API.Services.Factory
         public ICurrencyDataProvider GetCurrencyDataProvider()
         {
             try
-            {
-                string apiName = _options.ApiCurrent;
-
-                if (string.IsNullOrEmpty(apiName))
+            { 
+                return _options.ApiCurrent switch
                 {
-                    throw new ArgumentNullException(nameof(apiName), "Current api is null");
-                }
-
-                return apiName switch
-                {
-                    "PrivatBank" => (ICurrencyDataProvider)_serviceProvider.GetService(typeof(CurrencyDataProviderPrivatBank)),
-                    "RapidApi" => (ICurrencyDataProvider)_serviceProvider.GetService(typeof(CurrencyDataProviderRapid)),
-                    _ => throw new ArgumentOutOfRangeException(nameof(apiName), $"Api of '{apiName}' is not supported."),
+                    ApiEnum.PrivatBank => (ICurrencyDataProvider)_serviceProvider.GetService(typeof(CurrencyDataProviderPrivatBank)),
+                    ApiEnum.RapidApi => (ICurrencyDataProvider)_serviceProvider.GetService(typeof(CurrencyDataProviderRapid)),
+                    _ => throw new ArgumentOutOfRangeException(nameof(_options.ApiCurrent), $"Api of '{_options.ApiCurrent}' is not supported."),
                 };
             }
             catch(Exception ex)

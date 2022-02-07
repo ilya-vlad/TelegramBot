@@ -70,6 +70,15 @@ namespace Bot.Resources {
         }
         
         /// <summary>
+        ///   Looks up a localized string similar to Error getting data..
+        /// </summary>
+        internal static string ErrorGettingData {
+            get {
+                return ResourceManager.GetString("ErrorGettingData", resourceCulture);
+            }
+        }
+        
+        /// <summary>
         ///   Looks up a localized string similar to Example: &quot;usd 10.10.2020&quot; or &quot;usd&quot;.
         /// </summary>
         internal static string ExampleRequest {
@@ -129,6 +138,15 @@ namespace Bot.Resources {
         internal static string TryAgain {
             get {
                 return ResourceManager.GetString("TryAgain", resourceCulture);
+            }
+        }
+        
+        /// <summary>
+        ///   Looks up a localized string similar to Unknown error..
+        /// </summary>
+        internal static string UnknownError {
+            get {
+                return ResourceManager.GetString("UnknownError", resourceCulture);
             }
         }
     }

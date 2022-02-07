@@ -7,9 +7,11 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "Bot", "Bot\Bot.csproj", "{9
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "CacheContext", "CacheService\CacheContext.csproj", "{0D33A59A-7BC4-4E16-93AD-C17900587803}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "UnitTests", "UnitTests\UnitTests.csproj", "{F019191A-7657-4162-A02D-BE8F61CFD150}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API.Tests", "API.Tests\API.Tests.csproj", "{F019191A-7657-4162-A02D-BE8F61CFD150}"
 EndProject
 Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "API", "API\API.csproj", "{8B6D8643-2814-408B-A6A2-94B8B7653A80}"
+EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Bot.Tests", "Bot.Tests\Bot.Tests.csproj", "{98F67A1C-FD22-4489-8EB1-A4709EAE9095}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -33,6 +35,10 @@ Global
 		{8B6D8643-2814-408B-A6A2-94B8B7653A80}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{8B6D8643-2814-408B-A6A2-94B8B7653A80}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{8B6D8643-2814-408B-A6A2-94B8B7653A80}.Release|Any CPU.Build.0 = Release|Any CPU
+		{98F67A1C-FD22-4489-8EB1-A4709EAE9095}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{98F67A1C-FD22-4489-8EB1-A4709EAE9095}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{98F67A1C-FD22-4489-8EB1-A4709EAE9095}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{98F67A1C-FD22-4489-8EB1-A4709EAE9095}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
